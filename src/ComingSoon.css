@@ -1,0 +1,704 @@
+/* ============================================================
+   MINI 3D METROPOLIS & HIGH-CONTRAST HERO CONSOLE
+   (ZERO SCROLLING • 100% TEXT VISIBILITY & DENSE MINI CITY)
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@700;800;900&display=swap');
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  max-height: 100vh;
+  max-height: 100dvh;
+  overflow: hidden !important;
+  background-color: #0a0718;
+  color: #ffffff;
+  font-family: 'Poppins', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ============================================================
+   100VH SINGLE-PAGE ROOT WRAPPER
+   ============================================================ */
+.mini-city-universe {
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  max-height: 100vh;
+  max-height: 100dvh;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 32px 56px;
+  background: #0a0718;
+}
+
+/* ============================================================
+   THREE.JS WEBGL CANVAS (COVERS SCREEN EDGE-TO-EDGE)
+   ============================================================ */
+.three-canvas-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: auto;
+  overflow: hidden;
+}
+
+/* ============================================================
+   FOREGROUND: MODERN GLASSMORPHIC METROPOLIS CONSOLE
+   (FROSTED GLASS HUD • ARCHITECTURAL CAD AESTHETICS)
+   ============================================================ */
+.hero-atmosphere-zone {
+  position: relative;
+  z-index: 10;
+  max-width: 490px;
+  width: 100%;
+  max-height: calc(100vh - 48px);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  /* Ultra-modern frosted glass HUD */
+  background: linear-gradient(135deg, rgba(16, 12, 34, 0.75) 0%, rgba(9, 6, 22, 0.90) 100%);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 202, 40, 0.22);
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 
+    0 24px 60px rgba(0, 0, 0, 0.75), 
+    0 0 35px rgba(255, 179, 0, 0.08), 
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  padding: 28px 30px;
+  border-radius: 24px;
+  pointer-events: auto;
+  overflow: hidden;
+  animation: heroEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero-atmosphere-zone::before {
+  content: '';
+  position: absolute;
+  top: -60px;
+  left: -60px;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(255, 179, 0, 0.16) 0%, transparent 70%);
+  pointer-events: none;
+  border-radius: 50%;
+  filter: blur(35px);
+}
+
+@keyframes heroEntrance {
+  0% { opacity: 0; transform: translateX(-35px) scale(0.98); }
+  100% { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+/* Architectural HUD Corner Accents */
+.hud-corner {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  pointer-events: none;
+  border-color: rgba(255, 202, 40, 0.55);
+  border-style: solid;
+  z-index: 2;
+}
+
+.hud-corner-tl {
+  top: 10px;
+  left: 10px;
+  border-width: 1.5px 0 0 1.5px;
+  border-top-left-radius: 4px;
+}
+
+.hud-corner-tr {
+  top: 10px;
+  right: 10px;
+  border-width: 1.5px 1.5px 0 0;
+  border-top-right-radius: 4px;
+}
+
+.hud-corner-bl {
+  bottom: 10px;
+  left: 10px;
+  border-width: 0 0 1.5px 1.5px;
+  border-bottom-left-radius: 4px;
+}
+
+.hud-corner-br {
+  bottom: 10px;
+  right: 10px;
+  border-width: 0 1.5px 1.5px 0;
+  border-bottom-right-radius: 4px;
+}
+
+/* Status Pill */
+.status-pill-3d {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 179, 0, 0.08);
+  border: 1px solid rgba(255, 202, 40, 0.35);
+  padding: 5px 14px;
+  border-radius: 100px;
+  align-self: flex-start;
+  box-shadow: 0 0 16px rgba(255, 179, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+}
+
+.beacon-pulse-dot {
+  width: 7px;
+  height: 7px;
+  background: #00e676;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #00e676;
+  animation: beaconPulse 1.4s infinite;
+}
+
+@keyframes beaconPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(0.65); opacity: 0.35; }
+}
+
+.status-pill-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+  color: #ffca28;
+  text-transform: uppercase;
+}
+
+/* Modern Headline Cluster */
+.headline-3d-cluster {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.headline-kicker-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.kicker-crosshair {
+  font-size: 0.85rem;
+  color: #ffb300;
+  opacity: 0.9;
+  line-height: 1;
+}
+
+.headline-pre-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #ffd54f;
+  letter-spacing: 3.5px;
+  text-transform: uppercase;
+}
+
+.headline-3d-title {
+  font-size: 2.85rem;
+  font-weight: 900;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #ffffff 0%, #fff7ed 30%, #ffc107 70%, #ff8f00 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 4px 20px rgba(255, 179, 0, 0.35));
+}
+
+/* Crisp, Readable Purpose Description */
+.hero-crisp-desc {
+  font-size: 0.92rem;
+  color: #cbd5e1;
+  line-height: 1.62;
+  font-weight: 400;
+}
+
+/* ============================================================
+   LUXURY GLASSMORPHIC LIVE CLOCK (CURRENT LOCAL TIME)
+   ============================================================ */
+.live-clock-3d-module {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: rgba(12, 9, 28, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 12px 14px;
+  width: 100%;
+}
+
+.clock-sub-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.clock-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.clock-pulse-indicator {
+  width: 6px;
+  height: 6px;
+  background: #00e676;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #00e676;
+  animation: beaconPulse 1.2s infinite;
+}
+
+.clock-title-badge {
+  color: #00e676;
+  font-weight: 800;
+}
+
+.clock-date-display {
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+/* Balanced 4-Column Uniform Grid */
+.clock-tiles-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  width: 100%;
+}
+
+/* Modern Sculpted Glass Clock Tiles */
+.clock-tile-3d {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(18, 14, 38, 0.85) 100%);
+  border: 1px solid rgba(255, 202, 40, 0.22);
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  border-bottom: 2px solid rgba(255, 179, 0, 0.65);
+  border-radius: 12px;
+  padding: 8px 4px;
+  text-align: center;
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    0 6px 16px rgba(0, 0, 0, 0.5);
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 68px;
+}
+
+.clock-tile-3d:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 213, 79, 0.6);
+  box-shadow: 0 8px 24px rgba(255, 179, 0, 0.25);
+}
+
+.tile-seconds {
+  border-bottom-color: rgba(255, 112, 67, 0.75);
+}
+
+.tile-ampm {
+  border-bottom-color: rgba(255, 202, 40, 0.75);
+}
+
+.tile-value {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.95rem;
+  font-weight: 800;
+  color: #ffca28;
+  line-height: 1;
+  text-shadow: 0 0 16px rgba(255, 202, 40, 0.45);
+}
+
+.ampm-value-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.tile-ampm-val {
+  font-size: 1.65rem;
+}
+
+.ampm-pulse-dot {
+  width: 5px;
+  height: 5px;
+  background: #00e676;
+  border-radius: 50%;
+  box-shadow: 0 0 6px #00e676;
+}
+
+.tile-caption {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.54rem;
+  color: #94a3b8;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  margin-top: 4px;
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   SLEEK HIGH-TECH EARLY ACCESS FORM
+   ============================================================ */
+.early-access-form-3d {
+  width: 100%;
+}
+
+.form-input-pill {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 52px;
+  background: rgba(12, 9, 28, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 100px;
+  padding: 5px 6px 5px 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: all 0.25s ease;
+}
+
+.form-input-pill:focus-within {
+  border-color: #ffb300;
+  box-shadow: 0 0 25px rgba(255, 179, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.input-icon-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffca28;
+  opacity: 0.85;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.form-input-pill input {
+  flex: 1;
+  height: 100%;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.88rem;
+  outline: none;
+  min-width: 0;
+}
+
+.form-input-pill input::placeholder {
+  color: #94a3b8;
+}
+
+.form-btn-3d {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 42px;
+  padding: 0 22px;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #ffd54f 0%, #ffb300 50%, #f57c00 100%);
+  border: none;
+  border-radius: 100px;
+  color: #0b0717;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 800;
+  font-size: 0.84rem;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    0 4px 16px rgba(255, 152, 0, 0.45);
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.form-btn-3d:hover {
+  background: linear-gradient(135deg, #ffe082 0%, #ffca28 50%, #fb8c00 100%);
+  transform: translateY(-1px);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 6px 22px rgba(255, 179, 0, 0.6);
+}
+
+.form-btn-3d:hover svg {
+  transform: translateX(3px);
+}
+
+.form-btn-3d svg {
+  transition: transform 0.2s ease;
+}
+
+.form-btn-3d:active {
+  transform: translateY(1px);
+  box-shadow: 
+    inset 0 1px 0 rgba(0, 0, 0, 0.2),
+    0 2px 6px rgba(255, 152, 0, 0.3);
+}
+
+/* ============================================================
+   HIGH-PRECISION CONSTRUCTION TELEMETRY
+   ============================================================ */
+.milestone-progress-3d {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.progress-labels-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.66rem;
+  letter-spacing: 1px;
+  line-height: 1;
+}
+
+.milestone-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.milestone-telemetry-dot {
+  width: 6px;
+  height: 6px;
+  background: #ffb300;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #ffb300;
+  flex-shrink: 0;
+}
+
+.milestone-title {
+  color: #94a3b8;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.milestone-percent {
+  color: #ffca28;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.progress-rail-3d {
+  position: relative;
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.progress-fill-modern {
+  position: relative;
+  height: 100%;
+  width: 88%;
+  background: linear-gradient(90deg, #f57c00 0%, #ffb300 70%, #ffd54f 100%);
+  border-radius: 6px;
+  box-shadow: 0 0 14px rgba(255, 179, 0, 0.6);
+}
+
+.progress-glow-head {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 10px;
+  height: 100%;
+  background: #ffffff;
+  border-radius: 6px;
+  box-shadow: 0 0 10px #ffffff, 0 0 20px #ffca28;
+}
+
+/* ============================================================
+   RESPONSIVE DESIGN (MAINTAINS STRICT ZERO-SCROLL ON ALL SCREENS)
+   ============================================================ */
+@media (max-width: 960px) {
+  .mini-city-universe {
+    padding: 16px 20px;
+    align-items: flex-end;
+  }
+
+  .hero-atmosphere-zone {
+    max-width: 100%;
+    padding: 22px 24px;
+    gap: 13px;
+  }
+
+  .headline-3d-title {
+    font-size: 2.2rem;
+  }
+
+  .tile-value {
+    font-size: 1.75rem;
+  }
+
+  .tile-ampm-val {
+    font-size: 1.4rem;
+  }
+}
+
+@media (max-width: 540px) {
+  .mini-city-universe {
+    padding: 12px 14px;
+  }
+
+  .hero-atmosphere-zone {
+    padding: 18px 16px;
+    border-radius: 18px;
+    gap: 11px;
+  }
+
+  .headline-3d-title {
+    font-size: 1.7rem;
+  }
+
+  .hero-crisp-desc {
+    font-size: 0.80rem;
+    line-height: 1.45;
+  }
+
+  .clock-date-display {
+    display: none;
+  }
+
+  .clock-tiles-row {
+    gap: 5px;
+  }
+
+  .clock-tile-3d {
+    min-height: 58px;
+    padding: 6px 2px;
+  }
+
+  .tile-value {
+    font-size: 1.45rem;
+  }
+
+  .tile-ampm-val {
+    font-size: 1.25rem;
+  }
+
+  .tile-caption {
+    font-size: 0.48rem;
+    letter-spacing: 0.8px;
+  }
+
+  .form-input-pill {
+    height: 48px;
+    padding: 4px 4px 4px 12px;
+  }
+
+  .form-btn-3d {
+    height: 40px;
+    padding: 0 14px;
+    font-size: 0.78rem;
+  }
+}
+
+/* ============================================================
+   SLEEK NON-BLOCKING 3D STREAMING PILL
+   ============================================================ */
+.city-streaming-pill {
+  position: absolute;
+  top: 24px;
+  right: 28px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(14, 10, 32, 0.85);
+  border: 1px solid rgba(255, 202, 40, 0.4);
+  border-radius: 40px;
+  padding: 8px 18px;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 16px rgba(255, 179, 0, 0.25);
+  animation: fadeIn 0.4s ease-out;
+}
+
+.streaming-spinner-ring {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 202, 40, 0.25);
+  border-top-color: #ffca28;
+  border-radius: 50%;
+  animation: ringSpin 0.75s linear infinite;
+  box-shadow: 0 0 8px rgba(255, 202, 40, 0.4);
+}
+
+.streaming-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.streaming-title {
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: #ffca28;
+  text-transform: uppercase;
+}
+
+.streaming-progress-track {
+  width: 110px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.streaming-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff9800, #ffca28);
+  border-radius: 4px;
+  transition: width 0.2s ease-out;
+  box-shadow: 0 0 6px #ffca28;
+}
+
+.streaming-percent {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #cbd5e1;
+}
+
+@keyframes ringSpin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
