@@ -173,6 +173,105 @@ const ComingSoon = () => {
     scene.add(groundMesh);
 
     // ============================================================
+    // PROGRESSIVE LOW-RESOLUTION 3D MODEL (0KB INSTANT LOD 0)
+    // Instant real 3D diorama geometry rendered at 0.0s while
+    // the 12MB full high-detail city model streams in the background
+    // ============================================================
+    const lowResCityGroup = new THREE.Group();
+
+    // Low-poly Central River Canal Water Plane
+    const canalGeo = new THREE.PlaneGeometry(15, 110);
+    const canalMat = new THREE.MeshStandardMaterial({ color: 0x0369a1, roughness: 0.1, metalness: 0.7 });
+    const canalMesh = new THREE.Mesh(canalGeo, canalMat);
+    canalMesh.rotation.x = -Math.PI / 2;
+    canalMesh.rotation.z = Math.PI / 4;
+    canalMesh.position.set(10, 0.02, 0);
+    canalMesh.receiveShadow = true;
+    lowResCityGroup.add(canalMesh);
+
+    // Low-poly Waterfront Mountain / Rock Outcrop
+    const rockGeo = new THREE.ConeGeometry(5.5, 6.5, 5);
+    const rockMat = new THREE.MeshStandardMaterial({ color: 0x2e3440, roughness: 0.95 });
+    const rock = new THREE.Mesh(rockGeo, rockMat);
+    rock.position.set(-2, 3.0, 3);
+    rock.castShadow = true;
+    lowResCityGroup.add(rock);
+
+    // 1. Uptown Residential Low-Poly District (Northwest)
+    const uptownBlocks = [
+      { x: -18, z: -22, w: 7, h: 4.5, d: 6, color: 0x334155 },
+      { x: -10, z: -28, w: 6, h: 3.5, d: 5, color: 0x475569 },
+      { x: -4, z: -20, w: 5, h: 5.0, d: 5, color: 0x3b4252 },
+      { x: -14, z: -14, w: 6, h: 4.0, d: 6, color: 0x2e3440 },
+      { x: -6, z: -12, w: 5, h: 3.8, d: 4, color: 0x434c5e },
+      { x: 3, z: -18, w: 4, h: 4.2, d: 5, color: 0x4c566a },
+      { x: -12, z: -32, w: 8, h: 3.0, d: 6, color: 0x334155 },
+      { x: 0, z: -26, w: 5, h: 3.2, d: 5, color: 0x3b4252 },
+    ];
+
+    uptownBlocks.forEach((b) => {
+      const geo = new THREE.BoxGeometry(b.w, b.h, b.d);
+      const mat = new THREE.MeshStandardMaterial({
+        color: b.color,
+        roughness: 0.8,
+        metalness: 0.1,
+      });
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.position.set(b.x, b.h / 2, b.z);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      lowResCityGroup.add(mesh);
+
+      const roofGeo = new THREE.ConeGeometry(b.w * 0.58, 1.3, 4);
+      roofGeo.rotateY(Math.PI / 4);
+      const roofMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.7 });
+      const roof = new THREE.Mesh(roofGeo, roofMat);
+      roof.position.set(b.x, b.h + 0.65, b.z);
+      roof.castShadow = true;
+      lowResCityGroup.add(roof);
+    });
+
+    // 2. Downtown Commercial High-Rise Skyscraper District (Southeast)
+    const downtownTowers = [
+      { x: 24, z: 8, w: 6.5, h: 18.0, d: 6.5, color: 0x1e293b, glow: 0x38bdf8 },
+      { x: 33, z: 6, w: 7.0, h: 22.0, d: 7.0, color: 0x0f172a, glow: 0xffca28 },
+      { x: 26, z: 18, w: 6.0, h: 15.0, d: 6.0, color: 0x1e2638, glow: 0x38bdf8 },
+      { x: 36, z: 16, w: 6.5, h: 19.5, d: 6.5, color: 0x111827, glow: 0xf59e0b },
+      { x: 42, z: 8, w: 5.5, h: 13.0, d: 5.5, color: 0x334155, glow: 0x38bdf8 },
+      { x: 22, z: -1, w: 5.0, h: 12.0, d: 5.0, color: 0x1e293b, glow: 0xffca28 },
+      { x: 38, z: 23, w: 6.0, h: 14.0, d: 5.5, color: 0x1f2937, glow: 0x38bdf8 },
+    ];
+
+    downtownTowers.forEach((t) => {
+      const geo = new THREE.BoxGeometry(t.w, t.h, t.d);
+      const mat = new THREE.MeshStandardMaterial({
+        color: t.color,
+        roughness: 0.4,
+        metalness: 0.3,
+      });
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.position.set(t.x, t.h / 2, t.z);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      lowResCityGroup.add(mesh);
+
+      const crownGeo = new THREE.BoxGeometry(t.w * 0.85, 1.2, t.d * 0.85);
+      const crownMat = new THREE.MeshBasicMaterial({ color: t.glow });
+      const crown = new THREE.Mesh(crownGeo, crownMat);
+      crown.position.set(t.x, t.h + 0.6, t.z);
+      lowResCityGroup.add(crown);
+
+      const spire = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.08, 0.25, 3.5, 6),
+        mats.steelOrange
+      );
+      spire.position.set(t.x, t.h + 2.9, t.z);
+      lowResCityGroup.add(spire);
+    });
+
+    scene.add(lowResCityGroup);
+
+    // ============================================================
     // 6. 3D CITY LOADER SETUP WITH DRACO ACCELERATION & CACHE STORAGE
     // ============================================================
     const gltfLoader = new GLTFLoader();
@@ -225,10 +324,10 @@ const ComingSoon = () => {
 
       scene.add(cityObj);
 
-      // Reveal procedural centerpiece, bridge, and vehicles simultaneously
-      if (mainJobsite) mainJobsite.visible = true;
-      if (grandBridgeGroup) grandBridgeGroup.visible = true;
-      vehicles.forEach((c) => { c.visible = true; });
+      // Smoothly remove low-resolution 3D proxy now that full HD city is in place
+      if (lowResCityGroup) {
+        scene.remove(lowResCityGroup);
+      }
 
       setLoadingProgress(100);
       setTimeout(() => setIsLoaded(true), 350);
@@ -301,7 +400,6 @@ const ComingSoon = () => {
     // 7. ACTIVE CENTERPIECE CONSTRUCTION SITE WITH TOWER CRANE
     // ============================================================
     const mainJobsite = new THREE.Group();
-    mainJobsite.visible = false;
     const siteBase = new THREE.Mesh(new THREE.BoxGeometry(13, 0.5, 13), mats.darkBase);
     siteBase.position.y = 0.25;
     siteBase.receiveShadow = true;
@@ -564,7 +662,6 @@ const ComingSoon = () => {
     // Bridges the two halves of the city across the river canal!
     // ============================================================
     const grandBridgeGroup = new THREE.Group();
-    grandBridgeGroup.visible = false;
 
     // Bridge Deck (Spans diagonally from Uptown to Downtown)
     // Span midpoint: (10, 1.25, 0), length: ~23, angle: PI/4
@@ -736,7 +833,6 @@ const ComingSoon = () => {
         car.add(sign);
       }
 
-      car.visible = false;
       scene.add(car);
       return car;
     };
@@ -962,7 +1058,7 @@ const ComingSoon = () => {
         <div className="city-streaming-pill">
           <div className="streaming-spinner-ring"></div>
           <div className="streaming-info">
-            <span className="streaming-title">STREAMING 3D METROPOLIS</span>
+            <span className="streaming-title">STREAMING FULL-DETAIL 3D</span>
             <div className="streaming-progress-track">
               <div className="streaming-progress-fill" style={{ width: `${Math.max(loadingProgress, 8)}%` }}></div>
             </div>
@@ -972,18 +1068,10 @@ const ComingSoon = () => {
       )}
 
       {/* ============================================================
-          INSTANT PRE-RENDERED HIGH-RES 3D METROPOLIS POSTER
-          Loads in ~30ms at 0.0s so visitors see a bustling diorama immediately
-         ============================================================ */}
-      <div className={`city-hero-backdrop ${isLoaded ? 'is-faded' : ''}`}>
-        <div className="backdrop-gradient-overlay"></div>
-      </div>
-
-      {/* ============================================================
           REAL 3D THREE.JS WEBGL METROPOLIS (EDGE-TO-EDGE CANVAS)
-          Smoothly cross-fades into view once Draco 3D geometry is ready!
+          100% Real Interactive WebGL diorama with live 60 FPS diorama!
          ============================================================ */}
-      <div className={`three-canvas-container ${isLoaded ? 'is-ready' : 'is-loading'}`} ref={mountRef}></div>
+      <div className="three-canvas-container" ref={mountRef}></div>
 
       {/* ============================================================
           FOREGROUND: MODERN GLASSMORPHIC METROPOLIS CONSOLE

@@ -48,46 +48,8 @@ html, body {
 }
 
 /* ============================================================
-   INSTANT PRE-RENDERED 3D METROPOLIS HERO BACKDROP POSTER
-   (Loads in <50ms so visitors immediately see a thriving metropolis)
-   ============================================================ */
-.city-hero-backdrop {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  background-image: url('/images/metropolis-backdrop.webp');
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-color: #0a0718;
-  opacity: 1;
-  transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-  pointer-events: none;
-}
-
-.city-hero-backdrop.is-faded {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.backdrop-gradient-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: 
-    radial-gradient(circle at 75% 50%, transparent 20%, rgba(10, 7, 24, 0.35) 65%, rgba(10, 7, 24, 0.85) 95%),
-    linear-gradient(90deg, rgba(10, 7, 24, 0.94) 0%, rgba(10, 7, 24, 0.55) 45%, transparent 80%);
-  pointer-events: none;
-}
-
-/* ============================================================
    THREE.JS WEBGL CANVAS (COVERS SCREEN EDGE-TO-EDGE)
-   Smooth cross-fade into view once Draco 3D geometry is ready
+   Live interactive 60 FPS 3D diorama canvas
    ============================================================ */
 .three-canvas-container {
   position: absolute;
@@ -95,20 +57,9 @@ html, body {
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 2;
+  z-index: 1;
   pointer-events: auto;
   overflow: hidden;
-  opacity: 0;
-  transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.three-canvas-container.is-ready {
-  opacity: 1;
-}
-
-.three-canvas-container.is-loading {
-  opacity: 0;
-  pointer-events: none;
 }
 
 /* ============================================================
