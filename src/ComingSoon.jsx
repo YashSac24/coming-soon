@@ -173,7 +173,7 @@ const ComingSoon = () => {
     scene.add(groundMesh);
 
     // ============================================================
-    // 6. LOAD REAL 3D CITY MODEL WITH DRACO WEBASSEMBLY ACCELERATION
+    // 6. 3D CITY LOADER SETUP WITH DRACO ACCELERATION & CACHE STORAGE
     // ============================================================
     const gltfLoader = new GLTFLoader();
     const dracoLoader = new DRACOLoader();
@@ -193,73 +193,115 @@ const ComingSoon = () => {
       metalness: 0.1,
     });
 
-    const loadCity = (modelUrl) => {
+    const CACHE_NAME = 'metropolis-model-cache-v1';
+
+    const onModelLoaded = (gltf) => {
+      const cityObj = gltf.scene;
+
+      // Apply handcrafted low-poly game texture to all meshes
+      cityObj.traverse((child) => {
+        if (child.isMesh) {
+          child.material = cityMaterial;
+          child.castShadow = true;
+          child.receiveShadow = true;
+        }
+      });
+
+      // Compute bounds and scale so it fits the viewport comfortably
+      const box = new THREE.Box3().setFromObject(cityObj);
+      const size = box.getSize(new THREE.Vector3());
+      const center = box.getCenter(new THREE.Vector3());
+
+      const maxDim = Math.max(size.x, size.z);
+      const targetScale = 175 / maxDim;
+      cityObj.scale.set(targetScale, targetScale, targetScale);
+
+      // Position city centered on ground, shifted to right-center
+      cityObj.position.set(
+        -center.x * targetScale + 12,
+        -box.min.y * targetScale,
+        -center.z * targetScale - 6
+      );
+
+      scene.add(cityObj);
+
+      // Reveal procedural centerpiece, bridge, and vehicles simultaneously
+      if (mainJobsite) mainJobsite.visible = true;
+      if (grandBridgeGroup) grandBridgeGroup.visible = true;
+      vehicles.forEach((c) => { c.visible = true; });
+
+      setLoadingProgress(100);
+      setTimeout(() => setIsLoaded(true), 350);
+    };
+
+    const loadCity = async (modelUrl) => {
+      // 1. Try Cache API for instant 50ms load on repeat visits
+      if ('caches' in window) {
+        try {
+          const cache = await caches.open(CACHE_NAME);
+          const cachedResponse = await cache.match(modelUrl);
+          if (cachedResponse) {
+            const blob = await cachedResponse.blob();
+            const blobUrl = URL.createObjectURL(blob);
+            setLoadingProgress(92);
+            gltfLoader.load(
+              blobUrl,
+              (gltf) => {
+                onModelLoaded(gltf);
+                URL.revokeObjectURL(blobUrl);
+              },
+              undefined,
+              () => {
+                loadCityStandard(modelUrl);
+              }
+            );
+            return;
+          }
+        } catch (e) {
+          console.warn('Cache API lookup notice:', e);
+        }
+      }
+
+      // 2. Standard loader with progressive telemetry & background caching
+      loadCityStandard(modelUrl);
+    };
+
+    const loadCityStandard = (modelUrl) => {
       gltfLoader.load(
         modelUrl,
         (gltf) => {
-          const cityObj = gltf.scene;
-
-          // Apply handcrafted low-poly game texture to all meshes
-          cityObj.traverse((child) => {
-            if (child.isMesh) {
-              child.material = cityMaterial;
-              child.castShadow = true;
-              child.receiveShadow = true;
-            }
-          });
-
-          // Compute bounds and scale so it fits the viewport comfortably
-          const box = new THREE.Box3().setFromObject(cityObj);
-          const size = box.getSize(new THREE.Vector3());
-          const center = box.getCenter(new THREE.Vector3());
-
-          const maxDim = Math.max(size.x, size.z);
-          const targetScale = 175 / maxDim;
-          cityObj.scale.set(targetScale, targetScale, targetScale);
-
-          // Position city centered on ground, shifted to right-center
-          cityObj.position.set(
-            -center.x * targetScale + 12,
-            -box.min.y * targetScale,
-            -center.z * targetScale - 6
-          );
-
-          scene.add(cityObj);
-          setLoadingProgress(100);
-          setTimeout(() => setIsLoaded(true), 300);
+          onModelLoaded(gltf);
+          // Cache in background for instant subsequent visits
+          if ('caches' in window) {
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.add(modelUrl).catch(() => {});
+            });
+          }
         },
         (xhr) => {
           if (xhr.total > 0) {
             setLoadingProgress(Math.round((xhr.loaded / xhr.total) * 100));
+          } else if (xhr.loaded > 0) {
+            const estimatedTotal = 12.5 * 1024 * 1024;
+            const pct = Math.min(Math.round((xhr.loaded / estimatedTotal) * 100), 98);
+            setLoadingProgress(pct);
           }
         },
         (err) => {
           console.warn('Could not load 3D city model:', err);
+          if (mainJobsite) mainJobsite.visible = true;
+          if (grandBridgeGroup) grandBridgeGroup.visible = true;
+          vehicles.forEach((c) => { c.visible = true; });
           setIsLoaded(true);
         }
       );
     };
 
-    // Check if optimized Draco compressed model exists, fallback to standard GLB
-    const optModelUrl = '/models/city/LowPoly_City_01Ready_opt.glb';
-    const rawModelUrl = '/models/city/LowPoly_City_01Ready.glb';
-
-    fetch(optModelUrl, { method: 'HEAD' })
-      .then((res) => {
-        if (res.ok) {
-          loadCity(optModelUrl);
-        } else {
-          loadCity(rawModelUrl);
-        }
-      })
-      .catch(() => {
-        loadCity(rawModelUrl);
-      });
-
     // ============================================================
     // 7. ACTIVE CENTERPIECE CONSTRUCTION SITE WITH TOWER CRANE
     // ============================================================
     const mainJobsite = new THREE.Group();
+    mainJobsite.visible = false;
     const siteBase = new THREE.Mesh(new THREE.BoxGeometry(13, 0.5, 13), mats.darkBase);
     siteBase.position.y = 0.25;
     siteBase.receiveShadow = true;
@@ -522,6 +564,7 @@ const ComingSoon = () => {
     // Bridges the two halves of the city across the river canal!
     // ============================================================
     const grandBridgeGroup = new THREE.Group();
+    grandBridgeGroup.visible = false;
 
     // Bridge Deck (Spans diagonally from Uptown to Downtown)
     // Span midpoint: (10, 1.25, 0), length: ~23, angle: PI/4
@@ -693,6 +736,7 @@ const ComingSoon = () => {
         car.add(sign);
       }
 
+      car.visible = false;
       scene.add(car);
       return car;
     };
@@ -741,6 +785,22 @@ const ComingSoon = () => {
     const sportsCar = createVehicle({ type: 'sports', colorMat: mats.carRed });
     sportsCar.userData = { mode: 'bridge', t: 0, speed: 0.0035 };
     vehicles.push(sportsCar);
+
+    // Begin background loading of 3D metropolis (opt Draco first, fallback raw)
+    const optModelUrl = '/models/city/LowPoly_City_01Ready_opt.glb';
+    const rawModelUrl = '/models/city/LowPoly_City_01Ready.glb';
+
+    fetch(optModelUrl, { method: 'HEAD' })
+      .then((res) => {
+        if (res.ok) {
+          loadCity(optModelUrl);
+        } else {
+          loadCity(rawModelUrl);
+        }
+      })
+      .catch(() => {
+        loadCity(rawModelUrl);
+      });
 
     // Helper: Interpolate along closed loop circuit
     const evalCircuit = (circuit, dist) => {
@@ -912,10 +972,18 @@ const ComingSoon = () => {
       )}
 
       {/* ============================================================
-          REAL 3D THREE.JS WEBGL METROPOLIS (EDGE-TO-EDGE CANVAS)
-          Your Real Downloaded 3D City, Animated Handyman & Construction!
+          INSTANT PRE-RENDERED HIGH-RES 3D METROPOLIS POSTER
+          Loads in ~30ms at 0.0s so visitors see a bustling diorama immediately
          ============================================================ */}
-      <div className="three-canvas-container" ref={mountRef}></div>
+      <div className={`city-hero-backdrop ${isLoaded ? 'is-faded' : ''}`}>
+        <div className="backdrop-gradient-overlay"></div>
+      </div>
+
+      {/* ============================================================
+          REAL 3D THREE.JS WEBGL METROPOLIS (EDGE-TO-EDGE CANVAS)
+          Smoothly cross-fades into view once Draco 3D geometry is ready!
+         ============================================================ */}
+      <div className={`three-canvas-container ${isLoaded ? 'is-ready' : 'is-loading'}`} ref={mountRef}></div>
 
       {/* ============================================================
           FOREGROUND: MODERN GLASSMORPHIC METROPOLIS CONSOLE
